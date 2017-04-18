@@ -1,5 +1,7 @@
 package com.example.yhisl.cityworld.models;
 
+import com.example.yhisl.cityworld.app.MyApplication;
+
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
@@ -26,7 +28,7 @@ public class City extends RealmObject {
     }
 
     public City(String nombre, String descripcion, int imageBack, int star){
-        this.id =
+        this.id = MyApplication.
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.imageBack = imageBack;
