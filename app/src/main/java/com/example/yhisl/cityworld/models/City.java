@@ -1,17 +1,32 @@
 package com.example.yhisl.cityworld.models;
 
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
+import io.realm.annotations.Required;
+
 /**
  * Created by yhisl on 17/04/2017.
  */
 
-public class City  {
+public class City extends RealmObject {
 
+    @PrimaryKey
+    private int id;
+    @Required
     private String nombre;
+    @Required
     private String descripcion;
+    @Required
     private int imageBack;
+    @Required
     private int star;
 
+    public City(){
+
+    }
+
     public City(String nombre, String descripcion, int imageBack, int star){
+        this.id =
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.imageBack = imageBack;
