@@ -28,7 +28,7 @@ public class City extends RealmObject {
     }
 
     public City(String nombre, String descripcion, int imageBack, int star){
-        this.id = MyApplication.
+        this.id = MyApplication.CityID.incrementAndGet(); //incrementa el id, con ayuda de método getIdByTable en MyApplication
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.imageBack = imageBack;
