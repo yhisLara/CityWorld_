@@ -1,5 +1,7 @@
 package com.example.yhisl.cityworld.models;
 
+import android.widget.RatingBar;
+
 import com.example.yhisl.cityworld.app.MyApplication;
 
 import io.realm.RealmObject;
@@ -14,24 +16,20 @@ public class City extends RealmObject {
 
     @PrimaryKey
     private int id;
-    @Required
     private String nombre;
-    @Required
     private String descripcion;
-    @Required
-    private int imageBack;
-    @Required
+   // private int imageBack;
     private int star;
 
     public City(){
 
     }
 
-    public City(String nombre, String descripcion, int imageBack, int star){
+    public City(String nombre, String descripcion, /*int imageBack,*/ int star){
         this.id = MyApplication.CityID.incrementAndGet(); //incrementa el id, con ayuda de método getIdByTable en MyApplication
         this.nombre = nombre;
         this.descripcion = descripcion;
-        this.imageBack = imageBack;
+        //this.imageBack = imageBack;
         this.star = star;
     }
 
@@ -51,13 +49,13 @@ public class City extends RealmObject {
         this.descripcion = descripcion;
     }
 
-    public int getImageBack() {
+    /*public int getImageBack() {
         return imageBack;
     }
 
     public void setImageBack(int imageBack) {
         this.imageBack = imageBack;
-    }
+    }*/
 
     public int getStar() {
         return star;
