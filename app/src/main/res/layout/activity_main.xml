@@ -3,11 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.yhisl.cityworld.MainActivity">
+    tools:context="com.example.yhisl.cityworld.activities.MainActivity">
 
-
-    <ListView
-        android:id="@+id/listViewBoards"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:scrollbars="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

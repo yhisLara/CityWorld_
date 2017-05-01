@@ -1,16 +1,21 @@
-package com.example.yhisl.cityworld;
+package com.example.yhisl.cityworld.activities;
 
+import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RatingBar;
 
+import com.example.yhisl.cityworld.R;
 import com.example.yhisl.cityworld.adapters.CityAdapter;
 import com.example.yhisl.cityworld.models.City;
 
@@ -23,9 +28,13 @@ public class MainActivity extends AppCompatActivity implements RealmChangeListen
     private Realm realm;
     private RealmResults<City> cities;
 
-    private CityAdapter adapter;
-    private ListView listView;
+    private RecyclerView mRecyclerView;
+    private RecyclerView.LayoutManager mLayout;
+    private RecyclerView.Adapter adapter;
+
+    private RecyclerView listView;
     private FloatingActionButton fab;
+    final int ACTION_NUMBER_ADD = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,22 +44,40 @@ public class MainActivity extends AppCompatActivity implements RealmChangeListen
         realm = Realm.getDefaultInstance();
         cities = realm.where(City.class).findAll();
         cities.addChangeListener(this);
-        adapter = new CityAdapter(this ,R.layout.add_city, cities);
         fab = (FloatingActionButton) findViewById(R.id.fabAddCity);
-        listView = (ListView) findViewById(R.layout.activity_main);
+        adapter = new CityAdapter(this ,R.layout.cardview_items, cities, new CityAdapter.OnItemClickListener(){
+
+            @Override
+            public void onItemClick(City cities, int position) {
+
+            }
+        });
+        listView = (RecyclerView) findViewById(R.id.recyclerView);
         listView.setAdapter(adapter);
+
+
+        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        mLayout = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        mRecyclerView.setLayoutManager(mLayout);
+        mRecyclerView.setAdapter(adapter);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 addNewCity();
+
             }
         });
+
 
     }
 
     private void addNewCity() {
 
-     View view = LayoutInflater.from(this).inflate(R.layout.add_city,null);
+        Intent intent = new Intent(MainActivity.this, SecondActivity.class);
+        intent.putExtra("ACTION",ACTION_NUMBER_ADD);
+        startActivity(intent);
+        /*
+        View view = LayoutInflater.from(this).inflate(R.layout.add_city,null);
         EditText name = (EditText) view.findViewById(R.id.editTextName);
         EditText description = (EditText) view.findViewById(R.id.editTextDescription);
         EditText link = (EditText) view.findViewById(R.id.editTextLink);
@@ -62,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements RealmChangeListen
         realm.beginTransaction();
         City city = new City(name_,description_,rating_);
         realm.copyToRealm(city);
-        realm.commitTransaction();
+        realm.commitTransaction();*/
 
     }
 
@@ -71,8 +98,7 @@ public class MainActivity extends AppCompatActivity implements RealmChangeListen
 
     }
 
-    @Override
-    public void onChange(RealmResults<City> element) {
-
+    public void onChange(RealmResults<City> cities) {
+        adapter.notifyDataSetChanged();
     }
 }
