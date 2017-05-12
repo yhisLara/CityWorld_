@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -30,21 +31,20 @@ public class CityAdapter extends RecyclerView.Adapter<CityAdapter.ViewHolder>{
     private int layout;
     private List<City> cities;
     private OnItemClickListener itemClickListener;
+    private OnButtonClickListener btnClickListener;
 
-    public CityAdapter (Context context, int layout , List<City> cities, OnItemClickListener itemClickListener){
+    public CityAdapter (Context context, int layout , List<City> cities, OnItemClickListener itemClickListener, OnButtonClickListener bntClickListener){
         this.context = context;
         this.layout = layout;
         this.cities = cities;
         this.itemClickListener = itemClickListener;
+        this.btnClickListener = btnClickListener;
 
     }
-
 
     public int getCount() {
         return cities.size();
     }
-
-
     public Object getItem(int position) {
         return cities.get(position);
     }
@@ -59,7 +59,7 @@ public class CityAdapter extends RecyclerView.Adapter<CityAdapter.ViewHolder>{
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.bind(cities.get(position), itemClickListener);
+        holder.bind(cities.get(position), itemClickListener, btnClickListener);
     }
 
     @Override
@@ -73,39 +73,39 @@ public class CityAdapter extends RecyclerView.Adapter<CityAdapter.ViewHolder>{
     }
 
 
-    public View getView(int position, View convertView, ViewGroup parent) {
-       ViewHolder vh ;
-        ImageView imagenPoster;
+//    public View getView(int position, View convertView, ViewGroup parent) {
+//       ViewHolder vh ;
+//        ImageView imagenPoster;
+//
+//        if(convertView == null){
+//            convertView = LayoutInflater.from(context).inflate(layout, null);
+//            vh = new ViewHolder(convertView);
+//            vh.name = (TextView) convertView.findViewById(R.id.textNameCity);
+//            vh.description = (TextView) convertView.findViewById(R.id.textDescription);
+//            vh.ranking = (TextView) convertView.findViewById(R.id.textRating);
+//            vh.imageBack = (ImageView) convertView.findViewById(R.id.imageBackground);
+//
+//            convertView.setTag(vh);
+//        }
+//        else{
+//
+//            vh = (ViewHolder) convertView.getTag();
+//        }
+//
+//        City city = cities.get(position);
+//        vh.name.setText(city.getNombre());
+//        vh.description.setText(city.getDescripcion());
+//        vh.ranking.setText(city.getStar());
+//
+//        return convertView;
+//    }
 
-        if(convertView == null){
-            convertView = LayoutInflater.from(context).inflate(layout, null);
-            vh = new ViewHolder(convertView);
-            vh.name = (TextView) convertView.findViewById(R.id.textNameCity);
-            vh.description = (TextView) convertView.findViewById(R.id.textDescription);
-            vh.ranking = (TextView) convertView.findViewById(R.id.textRating);
-            vh.imageBack = (ImageView) convertView.findViewById(R.id.imageBackground);
-
-            convertView.setTag(vh);
-        }
-        else{
-
-            vh = (ViewHolder) convertView.getTag();
-        }
-
-        City city = cities.get(position);
-        vh.name.setText(city.getNombre());
-        vh.description.setText(city.getDescripcion());
-        vh.ranking.setText(city.getStar());
-
-        return convertView;
-    }
-
-    public class ViewHolder extends RecyclerView.ViewHolder implements OnItemClickListener {
-        TextView name;
-        TextView description;
-        TextView ranking;
-        ImageView imageBack;
-        OnItemClickListener itemClickListener;
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        public TextView name;
+        public TextView description;
+        public TextView ranking;
+        public ImageView imageBack;
+        public Button btnDelete;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -113,16 +113,14 @@ public class CityAdapter extends RecyclerView.Adapter<CityAdapter.ViewHolder>{
             description = (TextView) itemView.findViewById(R.id.textDescription);
             ranking = (TextView) itemView.findViewById(R.id.textRating);
             imageBack = (ImageView) itemView.findViewById(R.id.imageBackground);
-
-            //Agregar los onclick
+            btnDelete = (Button) itemView.findViewById(R.id.buttonDelete);
         }
 
-        public void bind(final City cities, final OnItemClickListener listener){
+        public void bind(final City cities, final OnItemClickListener listener, final  OnButtonClickListener btnListener){
             name.setText(cities.getNombre());
             description.setText(cities.getDescripcion());
             ranking.setText(cities.getStar() + "");
-
-            //Picasso.with(context).load(cities.).fit().into(imageBack);
+            Picasso.with(context).load(cities.getImageBack()).fit().into(imageBack);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -130,14 +128,21 @@ public class CityAdapter extends RecyclerView.Adapter<CityAdapter.ViewHolder>{
                     listener.onItemClick(cities,getAdapterPosition());
                 }
             });
-        }
 
-        @Override
-        public void onItemClick(City cities, int position) {
+            btnDelete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    btnListener.onButtonClick(cities,getAdapterPosition());
+                }
+            });
 
         }
     }
     public interface OnItemClickListener{
         void onItemClick(City cities, int position);
+    }
+
+    public interface  OnButtonClickListener{
+        void onButtonClick(City citu, int position);
     }
 }

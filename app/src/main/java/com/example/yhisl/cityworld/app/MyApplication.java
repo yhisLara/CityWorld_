@@ -22,12 +22,10 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
 
-        Realm.init(this);
         realmConfig();
         Realm realm = Realm.getDefaultInstance();
-
         CityID = getIdByTable(realm, City.class);
-
+        realm.close();
 
     }
 

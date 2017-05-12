@@ -1,9 +1,13 @@
 package com.example.yhisl.cityworld.activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
@@ -14,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RatingBar;
+import android.widget.Toast;
 
 import com.example.yhisl.cityworld.R;
 import com.example.yhisl.cityworld.adapters.CityAdapter;
@@ -23,79 +28,94 @@ import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 
-public class MainActivity extends AppCompatActivity implements RealmChangeListener<RealmResults<City>>, AdapterView.OnItemClickListener {
+public class MainActivity extends AppCompatActivity implements RealmChangeListener<RealmResults<City>> {
 
     private Realm realm;
     private RealmResults<City> cities;
 
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayout;
-    private RecyclerView.Adapter adapter;
+    private CityAdapter adapter;
 
-    private RecyclerView listView;
     private FloatingActionButton fab;
     final int ACTION_NUMBER_ADD = 1;
+    final int ACTION_NUMBER_EDIT = 2;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         realm = Realm.getDefaultInstance();
         cities = realm.where(City.class).findAll();
         cities.addChangeListener(this);
-        fab = (FloatingActionButton) findViewById(R.id.fabAddCity);
-        adapter = new CityAdapter(this ,R.layout.cardview_items, cities, new CityAdapter.OnItemClickListener(){
-
-            @Override
-            public void onItemClick(City cities, int position) {
-
-            }
-        });
-        listView = (RecyclerView) findViewById(R.id.recyclerView);
-        listView.setAdapter(adapter);
-
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        mLayout = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mLayout = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayout);
-        mRecyclerView.setAdapter(adapter);
+
+        fab = (FloatingActionButton) findViewById(R.id.fabAddCity);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addNewCity();
-
+                Intent intent = new Intent(MainActivity.this, SecondActivity.class);
+                startActivity(intent);
             }
         });
 
 
+        adapter = new CityAdapter(this, R.layout.cardview_items, cities, new CityAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(City cities, int position) {
+                Intent intent = new Intent(MainActivity.this, SecondActivity.class);
+                intent.putExtra("id", cities.getId());
+                startActivity(intent);
+            }
+        }, new CityAdapter.OnButtonClickListener() {
+            @Override
+            public void onButtonClick(City city, int position) {
+                showAlertForRemovingCity("Delete City", " Are you sure you want to delete" + city.getNombre()+ "?", position);
+            }
+        });
+
+        mRecyclerView.setAdapter(adapter);
+        cities.addChangeListener(this);
+
+        setHideShowFAB();
+
     }
 
-    private void addNewCity() {
+    private void setHideShowFAB(){
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener(){
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy){
+                if(dy > 0)
+                    fab.hide();
+                else if(dy < 0)
+                    fab.show();
+            }
+        });
+    }
 
-        Intent intent = new Intent(MainActivity.this, SecondActivity.class);
-        intent.putExtra("ACTION",ACTION_NUMBER_ADD);
-        startActivity(intent);
-        /*
-        View view = LayoutInflater.from(this).inflate(R.layout.add_city,null);
-        EditText name = (EditText) view.findViewById(R.id.editTextName);
-        EditText description = (EditText) view.findViewById(R.id.editTextDescription);
-        EditText link = (EditText) view.findViewById(R.id.editTextLink);
-        RatingBar rating = (RatingBar) view.findViewById(R.id.textRating);
+    private void showAlertForRemovingCity(String title, String message, final int position){
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("Remove", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        deleteCity(position);
+                        Toast.makeText(MainActivity.this, "It has been deleted successfully",Toast.LENGTH_LONG).show();
+                    }
+                })
+                .setNegativeButton("Cancel", null).show();
+    }
 
-        String name_ = name.getText().toString().trim();
-        String description_ = description.getText().toString().trim();
-        int rating_ = rating.getNumStars();
+    private void deleteCity(int position){
         realm.beginTransaction();
-        City city = new City(name_,description_,rating_);
-        realm.copyToRealm(city);
-        realm.commitTransaction();*/
-
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+        cities.get(position).deleteFromRealm();
+        realm.commitTransaction();
     }
 
     public void onChange(RealmResults<City> cities) {

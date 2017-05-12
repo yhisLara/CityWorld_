@@ -18,18 +18,36 @@ public class City extends RealmObject {
     private int id;
     private String nombre;
     private String descripcion;
-   // private int imageBack;
-    private int star;
+    private int imageBack;
+    private float star;
+    private String link;
+
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public City(){
 
     }
 
-    public City(String nombre, String descripcion, /*int imageBack,*/ int star){
+    public City(String nombre, String descripcion, String link, float star){
         this.id = MyApplication.CityID.incrementAndGet(); //incrementa el id, con ayuda de método getIdByTable en MyApplication
         this.nombre = nombre;
         this.descripcion = descripcion;
-        //this.imageBack = imageBack;
+        this.link = link;
+        this.imageBack = imageBack;
         this.star = star;
     }
 
@@ -49,15 +67,15 @@ public class City extends RealmObject {
         this.descripcion = descripcion;
     }
 
-    /*public int getImageBack() {
+    public int getImageBack() {
         return imageBack;
     }
 
     public void setImageBack(int imageBack) {
         this.imageBack = imageBack;
-    }*/
+    }
 
-    public int getStar() {
+    public float getStar() {
         return star;
     }
 
